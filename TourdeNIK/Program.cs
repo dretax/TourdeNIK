@@ -9,8 +9,46 @@ namespace TourdeNIK
         public static void Main(string[] args)
         {
             Randomizer = new Random();
+            
+            VersenyBrigad asd = new VersenyBrigad();
 
-            Console.ReadKey();
+            for (int i = 0; i < 10; i++)
+            {
+                asd.AddInSortedWay(new Versenyzo(RandomString(10)));
+            }
+
+            Console.WriteLine("1. brigád érték: " + asd.FirstElement.Key);
+            
+            VersenyBrigad asd2 = new VersenyBrigad();
+
+            for (int i = 0; i < 10; i++)
+            {
+                asd2.AddInSortedWay(new Versenyzo(RandomString(10)));
+            }
+
+            Console.WriteLine("2. brigád érték: " + asd2.FirstElement.Key);
+            
+            VersenyBrigad asd3 = new VersenyBrigad();
+
+            for (int i = 0; i < 10; i++)
+            {
+                asd3.AddInSortedWay(new Versenyzo(RandomString(10)));
+            }
+
+            Console.WriteLine("3. brigád érték: " + asd3.FirstElement.Key);
+            
+            VersenyzoKezelo.InitializeKezelo();
+            VersenyzoKezelo handler = VersenyzoKezelo.Instance;
+            
+            handler.VersenyBrigadAdd(asd);
+            handler.VersenyBrigadAdd(asd2);
+            handler.VersenyBrigadAdd(asd3);
+            
+            handler.VersenyBrigadSort();
+            
+            handler.Print();
+
+            //Console.ReadKey();
         }
         
         internal static string RandomString(int length)
