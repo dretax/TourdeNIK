@@ -6,6 +6,9 @@ namespace TourdeNIK
     {
         public static Random Randomizer;
         
+        public static event NoLongerParticipates NParticipates;
+        public delegate void NoLongerParticipates(Versenyzo v);
+        
         public static void Main(string[] args)
         {
             Randomizer = new Random();

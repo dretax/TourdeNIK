@@ -10,7 +10,7 @@ namespace TourdeNIK
     /// </summary>
     public class VersenyBrigad
     {
-        public class ListElement
+        internal class ListElement
         {
             public int Key;
             public Versenyzo ElementValue;
@@ -19,7 +19,7 @@ namespace TourdeNIK
             public ListElement(TourdeNIK.Versenyzo val)
             {
                 this.ElementValue = val;
-                this.Key = val.VersenyzoAzonositoSzam;
+                this.Key = val.UniqueID;
             }
 
             public bool LastElement
@@ -32,7 +32,7 @@ namespace TourdeNIK
         private ListElement _FirstElement;
         private int _ListCount;
 
-        public ListElement FirstElement
+        internal ListElement FirstElement
         {
             get { return _FirstElement; }
         }
@@ -136,7 +136,7 @@ namespace TourdeNIK
             _ListCount++;
         }*/
 
-        public ListElement Find(Versenyzo element)
+        internal ListElement Find(Versenyzo element)
         {
             ListElement aktualis = _FirstElement;
             while (aktualis != null && !aktualis.ElementValue.Equals(element) && !aktualis.LastElement)
@@ -146,7 +146,7 @@ namespace TourdeNIK
             return aktualis;
         }
 
-        public ListElement Find(int azonosito)
+        internal ListElement Find(int azonosito)
         {
             ListElement aktualis = _FirstElement;
             while (aktualis != null && aktualis.Key != azonosito && !aktualis.LastElement)
@@ -156,7 +156,7 @@ namespace TourdeNIK
             return aktualis != null ? aktualis : null;
         }
         
-        public ListElement Find(string azonosito)
+        internal ListElement Find(string azonosito)
         {
             ListElement aktualis = _FirstElement;
             while (aktualis != null && aktualis.ElementValue.VersenyzoAzonosito != azonosito && !aktualis.LastElement)
@@ -218,89 +218,5 @@ namespace TourdeNIK
                 _ListCount--;
             }
         }
-        
-        /// <summary>
-        /// Megkeressük a legkissebb elemet, és azt tesszük meg az első elemnek (fej), és ezt N elemszámig nézzük.
-        /// Lényegében egy kiválasztásos rendezés az egész.
-        /// </summary>
-        /*public void SortLinkedList()
-        {
-            if (Count <= 1) // Egy, vagy 0 elemet azért ne akarjunk már rendezni.
-            {
-                return;
-            }
-            ListElement head = _FirstElement;
-            ListElement _current = head;
-            ListElement _previous = _current;
-            ListElement _min = _current;
-            ListElement _minPrevious = _min;
-            ListElement _sortedListHead = null;
-            ListElement _sortedListTail = _sortedListHead;
-            for (int i = 0; i < Count; i++)
-            {
-                _current = head;
-                _min = _current;
-                _minPrevious = _min;
-                //Megkeressük a legkisebb elemet.
-                while (_current != null)
-                {
-                    if (_current.Key < _min.Key)
-                    {
-                        _min = _current;
-                        _minPrevious = _previous;
-                    }
-
-                    // Ha az utolsó elemet értük el, állítsuk le a ciklust, hogy ne menjünk végtelenbe
-                    // illetve, hogy azt az elemet is a megfelelő helyre tegyük.
-                    if (_current.LastElement)
-                    {
-                        _current.NextElement = null;
-                        _current.LastElement = false;
-                        break;
-                    }
-                    _previous = _current;
-                    _current = _current.NextElement;
-                }
-                // Töröljük a minimális elemet.
-                if (_min == head)
-                {
-                    head = head.NextElement;
-                }
-                else if (_min.NextElement == null) //Ha esetlegesen a listánk vége nem lenne összekötve, akkor azt így offolnánk ki.
-                {
-                    Console.WriteLine("ab");
-                    _minPrevious.NextElement = null;
-                }
-                else
-                {
-                    _minPrevious.NextElement = _minPrevious.NextElement.NextElement;
-                }
-                
-                if (_sortedListHead != null)
-                {
-                    _sortedListTail.NextElement = _min;
-                    _sortedListTail = _sortedListTail.NextElement;
-                    if (i == Count - 1)
-                    {
-                        //Console.WriteLine("Utolsó elemünk: " + _sortedListTail.Key);
-                        _sortedListTail.LastElement = true;
-                    }
-                }
-                else
-                {
-                    _sortedListHead = _min;
-                    //Console.WriteLine("Első, és egyben a legkisebb elem: " + _min.Key);
-                    _sortedListTail = _sortedListHead;
-                }
-            }
-
-            _FirstElement = _sortedListHead;
-            if (_sortedListTail != null)
-            {
-                //Console.WriteLine("Utolsó elemünk: " + _sortedListTail.Key);
-                _sortedListTail.NextElement = _FirstElement;
-                //Console.WriteLine("Első elemünk: " + _sortedListTail.NextElement.Key);
-            }
-        }*/
     }
 }

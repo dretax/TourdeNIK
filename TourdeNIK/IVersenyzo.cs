@@ -6,8 +6,8 @@
         string VersenyzoAzonosito { get; set; }
         int Fogyasztas(int ora);
         int Terheles(int ora);
-        int TeherBiras();
+        double TeherBiras();
         bool TerhelHetoMeg();
-        string Versenyek { get; set; } // todo
+        RegularChainedList<Verseny> Versenyek { get; set; }
     }
 }

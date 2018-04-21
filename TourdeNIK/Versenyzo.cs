@@ -5,20 +5,38 @@ namespace TourdeNIK
     public class Versenyzo : IVersenyzo
     {
         private int _id;
+        
 
         public Versenyzo(string nev)
         {
             Nev = nev;
+            GenerateID();
+            Versenyek = new RegularChainedList<Verseny>();
+            Program.NParticipates += NemVersenyzikTobbet;
+        }
+
+        private void NemVersenyzikTobbet(Versenyzo v)
+        {
+            //todo:
+        }
+
+        private void GenerateID()
+        {
             _id = Program.Randomizer.Next(100, 1000);
-            VersenyzoAzonosito = Program.RandomString(1) + "-" + _id + Program.RandomString(2);
+            string s = "F";
+            if (Program.Randomizer.Next(0, 2) == 1)
+            {
+                s = "N";
+            }
+            VersenyzoAzonosito = s + "-" + _id + Program.RandomString(2);
         }
         
-        public int VersenyzoAzonositoSzam // Ez lesz a láncolt listában a kulcs
+        public int UniqueID // Ez lesz a láncolt listában a kulcs
         {
             get { return _id; }
         }
         
-        public string Versenyek { get; set; }
+        public RegularChainedList<Verseny> Versenyek { get; set; }
         public string Nev { get; set; }
         public string VersenyzoAzonosito { get; set; }
         
@@ -32,7 +50,7 @@ namespace TourdeNIK
             throw new System.NotImplementedException();
         }
 
-        public int TeherBiras()
+        public double TeherBiras()
         {
             throw new System.NotImplementedException();
         }

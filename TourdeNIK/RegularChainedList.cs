@@ -6,11 +6,10 @@ namespace TourdeNIK
     {
         internal class ListElement
         {
-            public int Key;
             public T ElementValue;
             public ListElement NextElement;
           
-            public ListElement(int key, T val)
+            public ListElement(T val)
             {
                 this.ElementValue = val;
             }
@@ -24,10 +23,10 @@ namespace TourdeNIK
 
         private ListElement _FirstElement;
 
-        public void Add(int key, T element)
+        public void Add(T element)
         {
             // Létrehozunk egy új lista elementet
-            ListElement uj = new ListElement(key, element);
+            ListElement uj = new ListElement(element);
             //Console.WriteLine("Hozzáadott érték: " + uj.ElementValue);
             
             // Ha a mostani elem az első a listában, akkor ez lesz az "utolsó" elem is egyben.
@@ -100,28 +99,16 @@ namespace TourdeNIK
             {
                 if (lastElement != null) // Ha van utolsó értékünk
                 {
-                    //Console.WriteLine("Megvan az elem: " + currentElement.ElementValue);
-                    //Console.WriteLine("Az előtte lévő elem értéke: " + lastElement.ElementValue);
                     // Ha az utolsó elemet töröltük tegyük meg az előtte lévőt utolsónak.
                     if (currentElement.LastElement)
                     {
                         lastElement.LastElement = true;
                     }
                     lastElement.NextElement = currentElement.NextElement; // Ha az utolsó elemet töröltük akkor a következő az első lesz, ha nem akkor pedig a törölt elem utáni.
-                    //Console.WriteLine("last element nem null, és az utáni értéke: " + lastElement.NextElement.ElementValue);
                 }
                 else
                 {
                     _FirstElement = currentElement.NextElement; // Ez null lesz ha a listánk abszolút üres lesz.
-                    /*if (_FirstElement == null)
-                    {
-                        Console.WriteLine("Null, üres");
-                    }
-                    else
-                    {
-                        Console.WriteLine("First element: " + _FirstElement.ElementValue + " kövi: " +
-                                          currentElement.NextElement.ElementValue);
-                    }*/
                 }
             }
         }

@@ -27,6 +27,14 @@ namespace TourdeNIK
         
         private VersenyzoKezelo.ListElement _FirstElement;
         private int VersenyBrigadCount;
+        public static event VersenyBrigadDisbanded VDisbanded;
+        public delegate void VersenyBrigadDisbanded(VersenyBrigad v);
+
+        private VersenyzoKezelo()
+        {
+            VDisbanded += BrigadDisbanded;
+        }
+        
 
         public static VersenyzoKezelo Instance
         {
@@ -37,6 +45,11 @@ namespace TourdeNIK
         public static void InitializeKezelo()
         {
             Instance = new VersenyzoKezelo();
+        }
+
+        private static void BrigadDisbanded(VersenyBrigad v)
+        {
+            Console.WriteLine("Egy versenybrigád törlésre került!");
         }
 
         public void VersenyBrigadAdd(VersenyBrigad element)
@@ -80,6 +93,38 @@ namespace TourdeNIK
         {
             
         }
+
+        public void VersenyzoTorol(Versenyzo v)
+        {
+            VersenyzoKezelo.ListElement currentElement = _FirstElement; // Vesszük az első elemet
+            
+            // Addig megyünk amíg a jelenlegi elemünk nem null, és az érték nem egyezik a megadottal.
+            while (currentElement != null)
+            {
+                VersenyBrigad brigad = currentElement.ElementValue;
+                if (brigad.FirstElement != null)
+                {
+                    VersenyBrigad.ListElement element = brigad.FirstElement;
+                    while (element != null)
+                    {
+                        Versenyzo v2 = element.ElementValue;
+                        if (v2.Equals(v))
+                        {
+                            brigad.Remove(v2);
+                            if (brigad.FirstElement == null)
+                            {
+                                VersenyBrigadDelete(brigad);
+                            }
+                            break;
+                        }
+                        if (element.LastElement) break;
+                        element = element.NextElement;
+                    }
+                }
+                
+                currentElement = currentElement.NextElement; // Vesszük a következő elemet
+            }
+        }
         
         public void Print()
         {
@@ -109,7 +154,7 @@ namespace TourdeNIK
                 _current = head;
                 _min = _current;
                 _minPrevious = _min;
-                //Find min Node
+                
                 while (_current != null)
                 {
                     if (_current.Key < _min.Key)
@@ -120,12 +165,12 @@ namespace TourdeNIK
                     _previous = _current;
                     _current = _current.NextElement;
                 }
-                // Remove min Node 
+
                 if (_min == head)
                 {
                     head = head.NextElement;
                 }
-                else if (_min.NextElement == null) //if tail is min node
+                else if (_min.NextElement == null)
                 {
                     _minPrevious.NextElement = null;
                 }
@@ -133,7 +178,7 @@ namespace TourdeNIK
                 {
                     _minPrevious.NextElement = _minPrevious.NextElement.NextElement;
                 }
-                //Attach min Node to the new sorted linked list
+
                 if (_sortedListHead != null)
                 {
                     _sortedListTail.NextElement = _min;
