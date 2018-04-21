@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ContentModelStore">
+    <e p="C:\Users\DreTaX\.Rider2017.3\system\resharper-host\local\Transient\ReSharperHost\v11\SolutionCaches\_TourdeNIK.169345003.00" t="ExcludeRecursive" />
+    <e p="E:\Users\DreTaX\Documents\Visual Studio 2013\TourdeNIK" t="IncludeFlat">
+      <e p="packages" t="ExcludeRecursive" />
+      <e p="TourdeNIK" t="IncludeRecursive">
+        <e p="bin" t="ExcludeRecursive" />
+        <e p="IVersenyzo.cs" t="Include" />
+        <e p="obj" t="ExcludeRecursive" />
+        <e p="Program.cs" t="Include" />
+        <e p="Properties" t="Include">
+          <e p="AssemblyInfo.cs" t="Include" />
+        </e>
+        <e p="RegularChainedList.cs" t="Include" />
+        <e p="TourdeNIK.csproj" t="IncludeRecursive" />
+        <e p="Verseny.cs" t="Include" />
+        <e p="VersenyBrigad.cs" t="Include" />
+        <e p="Versenyzo.cs" t="Include" />
+        <e p="VersenyzoKezelo.cs" t="Include" />
+      </e>
+      <e p="TourdeNIK.sln" t="IncludeFlat" />
+    </e>
+  </component>
+</project>

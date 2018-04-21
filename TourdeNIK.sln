@@ -1,0 +1,16 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TourdeNIK", "TourdeNIK\TourdeNIK.csproj", "{D1350E11-CECE-40B6-AF37-A3BB34273F27}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D1350E11-CECE-40B6-AF37-A3BB34273F27}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D1350E11-CECE-40B6-AF37-A3BB34273F27}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D1350E11-CECE-40B6-AF37-A3BB34273F27}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D1350E11-CECE-40B6-AF37-A3BB34273F27}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
