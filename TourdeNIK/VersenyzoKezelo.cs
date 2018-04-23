@@ -27,31 +27,48 @@ namespace TourdeNIK
         
         private VersenyzoKezelo.ListElement _FirstElement;
         private int VersenyBrigadCount;
+        
+        /// <summary>
+        /// Delegáltak.
+        /// </summary>
         public static event VersenyBrigadDisbanded VDisbanded;
         public delegate void VersenyBrigadDisbanded(VersenyBrigad v);
 
+        /// <summary>
+        /// Konstruktor a feladat alapján nem elérhető, és belülről van létrehozva az instance.
+        /// </summary>
         private VersenyzoKezelo()
         {
             VDisbanded += BrigadDisbanded;
         }
         
 
+        /// <summary>
+        /// Visszaadja az adott osztály instanceát ha az létezik.
+        /// </summary>
         public static VersenyzoKezelo Instance
         {
             get;
             set;
         }
 
+        /// <summary>
+        /// Létrehoz egy instance-t ennek az osztálynak.
+        /// </summary>
         public static void InitializeKezelo()
         {
             Instance = new VersenyzoKezelo();
         }
 
-        private static void BrigadDisbanded(VersenyBrigad v)
+        private void BrigadDisbanded(VersenyBrigad v)
         {
-            Console.WriteLine("Egy versenybrigád törlésre került!");
+            Console.WriteLine("Egy versenybrigád törlésre került! Neve: " + v.Name);
         }
 
+        /// <summary>
+        /// Hozzáadja a versenybrigádot a listához.
+        /// </summary>
+        /// <param name="element"></param>
         public void VersenyBrigadAdd(VersenyBrigad element)
         {
             // Létrehozunk egy új lista elementet
@@ -63,6 +80,10 @@ namespace TourdeNIK
             VersenyBrigadCount++;
         }
         
+        /// <summary>
+        /// Törli a specifikus versenybrigádot.
+        /// </summary>
+        /// <param name="element"></param>
         public void VersenyBrigadDelete(VersenyBrigad element)
         {
             VersenyzoKezelo.ListElement currentElement = _FirstElement; // Vesszük az első elemet
@@ -89,11 +110,36 @@ namespace TourdeNIK
             }
         }
 
+        /// <summary>
+        /// Hozzáadja a versenyzőt a specifikus brigádhoz.
+        /// </summary>
+        /// <param name="b"></param>
+        /// <param name="v"></param>
         public void VersenyzoHozzaAdd(VersenyBrigad b, Versenyzo v)
         {
-            
+            b.AddInSortedWay(v);
         }
 
+        /// <summary>
+        /// Törli a versenyzőt a specifikus brigádból.
+        /// </summary>
+        /// <param name="b"></param>
+        /// <param name="v"></param>
+        public void VersenyzoTorolFromBrigad(VersenyBrigad b, Versenyzo v)
+        {
+            b.Remove(v);
+            // Ha véletlenül az első elem kerülne törlésre frissítsük az kulcs értéket a legkisebbre.
+            // Így megtartjuk, hogy a brigádok mindíg a legkisebb azonosítószámmal vannak feltüntetve.
+            if (b.FirstElement != null)
+            {
+                this._FirstElement.Key = b.FirstElement.Key;
+            }
+        }
+
+        /// <summary>
+        /// Ezt a methodot úgy írtam meg, hogy az összes brigádot végig nézi egy adott versenyzőért, és ha megtalálja törli.
+        /// </summary>
+        /// <param name="v"></param>
         public void VersenyzoTorol(Versenyzo v)
         {
             VersenyzoKezelo.ListElement currentElement = _FirstElement; // Vesszük az első elemet
@@ -115,6 +161,15 @@ namespace TourdeNIK
                             {
                                 VersenyBrigadDelete(brigad);
                             }
+                            else
+                            {
+                                // Ha véletlenül az első elem kerülne törlésre frissítsük az kulcs értéket a legkisebbre.
+                                // Így megtartjuk, hogy a brigádok mindíg a legkisebb azonosítószámmal vannak feltüntetve.
+                                if (brigad.FirstElement != null)
+                                {
+                                    this._FirstElement.Key = brigad.FirstElement.Key;
+                                }
+                            }
                             break;
                         }
                         if (element.LastElement) break;
@@ -126,6 +181,10 @@ namespace TourdeNIK
             }
         }
         
+        /// <summary>
+        /// Kiírja a listában lévő kulcsértékeket és azok értékeit.
+        /// A kulcs a brigádban lévő versenyző UniqueID-je lesz (Az elsőé)
+        /// </summary>
         public void Print()
         {
             ListElement aktualis = _FirstElement;
@@ -136,6 +195,9 @@ namespace TourdeNIK
             }
         }
         
+        /// <summary>
+        /// Meghívásra képes rendezni a láncolt listát amennyiben több mint 1 elem van benne.
+        /// </summary>
         public void VersenyBrigadSort()
         {
             if (VersenyBrigadCount <= 1)

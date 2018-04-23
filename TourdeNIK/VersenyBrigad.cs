@@ -31,6 +31,17 @@ namespace TourdeNIK
 
         private ListElement _FirstElement;
         private int _ListCount;
+        private string _brigadname;
+
+        public VersenyBrigad(string brigadnev)
+        {
+            _brigadname = brigadnev;
+        }
+
+        public string Name
+        {
+            get { return _brigadname; }
+        }
 
         internal ListElement FirstElement
         {
