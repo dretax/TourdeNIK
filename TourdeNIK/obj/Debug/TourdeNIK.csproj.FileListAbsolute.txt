@@ -1,0 +1,6 @@
+E:\Users\DreTaX\Documents\Visual Studio 2013\TourdeNIK\TourdeNIK\bin\Debug\TourdeNIK.exe
+E:\Users\DreTaX\Documents\Visual Studio 2013\TourdeNIK\TourdeNIK\bin\Debug\TourdeNIK.pdb
+E:\Users\DreTaX\Documents\Visual Studio 2013\TourdeNIK\TourdeNIK\obj\Debug\TourdeNIK.csprojResolveAssemblyReference.cache
+E:\Users\DreTaX\Documents\Visual Studio 2013\TourdeNIK\TourdeNIK\obj\Debug\TourdeNIK.exe
+E:\Users\DreTaX\Documents\Visual Studio 2013\TourdeNIK\TourdeNIK\obj\Debug\TourdeNIK.pdb
+E:\Users\DreTaX\Documents\Visual Studio 2013\TourdeNIK\TourdeNIK\obj\Debug\TourdeNIK.csproj.CoreCompileInputs.cache

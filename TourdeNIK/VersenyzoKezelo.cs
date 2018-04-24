@@ -138,6 +138,7 @@ namespace TourdeNIK
 
         /// <summary>
         /// Ezt a methodot úgy írtam meg, hogy az összes brigádot végig nézi egy adott versenyzőért, és ha megtalálja törli.
+        /// Nem feltétlenül szükséges a használata, csak előre megcsináltam ha esetleg kellene.
         /// </summary>
         /// <param name="v"></param>
         public void VersenyzoTorol(Versenyzo v)
@@ -193,6 +194,15 @@ namespace TourdeNIK
                 Console.WriteLine("Adat: " + aktualis.ElementValue + " Key: " + aktualis.Key);
                 aktualis = aktualis.NextElement;
             }
+        }
+
+        /// <summary>
+        /// A brigádban lévő versenyzőknek hasonló mennyiségű versenyt oszt ki a leterheltségük alapján.
+        /// </summary>
+        /// <param name="b"></param>
+        public void VersenyBrigadBeoszt(VersenyBrigad b)
+        {
+            //todo:
         }
         
         /// <summary>
