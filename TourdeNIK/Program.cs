@@ -94,13 +94,19 @@ namespace TourdeNIK
                         var data = ini.GetSetting(x, y).Split('~');
                         Versenyzo v = new Versenyzo(y, data[1], data[0]); // Létrehozzuk a versenyzőt az adatokkal, majd hozzáadjuk a brigádhoz rendezett beilesztéssel
                         handler.VersenyzoHozzaAdd(brigad, v);
-                        
+                        foreach (var z in data[2].Split(','))
+                        {
+                            v.Versenyek.Add(new Verseny(z, 1));
+                        }
+
                         //vteszt = brigad.FirstElement.ElementValue;
                         //bteszt = brigad;
                         //Console.WriteLine("V: " + v.UniqueID);
                     }
 
                     handler.VersenyBrigadAdd(brigad); // A brigádot hozzáadjuk a listához.
+
+                    brigad.BrigadBeosztas(AvailableRaces);
                     //Console.WriteLine(x + " : " + brigad.FirstElement.Key);
                 }
                 

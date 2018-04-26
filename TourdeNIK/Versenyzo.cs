@@ -6,8 +6,7 @@ namespace TourdeNIK
     {
         private int _id;
         private double _folyadekigeny;
-        private int _terheles;
-        private int _maxteher;
+        private double _terheles;
         
         public Versenyzo(string nev, string nem, string lakhely)
         {
@@ -16,7 +15,6 @@ namespace TourdeNIK
             Lakhely = lakhely;
             GenerateID();
             _folyadekigeny = Program.Randomizer.NextDouble() * (2.5 - 0.5) + 0.5; // Egy próba két érték közötti double randomra.
-            _maxteher = Program.Randomizer.Next(10, 20); // Mennyi legyen a versenyző maximális óra szám teherbírása.
             Versenyek = new RegularChainedList<Verseny>();
             Program.NParticipates += NemVersenyzikTobbet;
         }
@@ -51,12 +49,13 @@ namespace TourdeNIK
 
         public void Terheles(int ora)
         {
-            _terheles += ora;
+            // ez mondjuk 5 óra esetén, 0.05-s terhelés lenne! tehát 30 óra versenyenként, az 0.3-as terhelés.
+            _terheles += (double) ora / 100;
         }
 
         public double TeherBiras()
         {
-            return _terheles / _maxteher;
+            return _terheles;
         }
 
         public bool TerhelHetoMeg()

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 
 namespace TourdeNIK
 {
@@ -22,6 +23,17 @@ namespace TourdeNIK
         }
 
         private ListElement _FirstElement;
+        private int _count;
+        
+        internal ListElement FirstElement
+        {
+            get { return _FirstElement; }
+        }
+
+        internal int Count
+        {
+            get { return _count; }
+        }
 
         public void Add(T element)
         {
@@ -61,6 +73,7 @@ namespace TourdeNIK
             
             // Az első elem az újonnan létrehozott lesz.
             _FirstElement = uj;
+            _count++;
         }
 
         public bool Find(T element)
@@ -110,6 +123,8 @@ namespace TourdeNIK
                 {
                     _FirstElement = currentElement.NextElement; // Ez null lesz ha a listánk abszolút üres lesz.
                 }
+
+                _count--;
             }
         }
     }

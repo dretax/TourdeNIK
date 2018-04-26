@@ -200,9 +200,9 @@ namespace TourdeNIK
         /// A brigádban lévő versenyzőknek hasonló mennyiségű versenyt oszt ki a leterheltségük alapján.
         /// </summary>
         /// <param name="b"></param>
-        public void VersenyBrigadBeoszt(VersenyBrigad b)
+        public void VersenyBrigadBeoszt(RegularChainedList<VersenyBrigad> brigadok, VersenyBrigad ideiglenes)
         {
-            //todo:
+            
         }
         
         /// <summary>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Threading;
 
@@ -6,7 +7,6 @@ namespace TourdeNIK
 {
     /// <summary>
     /// Egy láncolt listát reprezentál de kifejezetten csak a Versenyzo osztályra.
-    /// 
     /// </summary>
     public class VersenyBrigad
     {
@@ -103,6 +103,8 @@ namespace TourdeNIK
                 uj.NextElement = _FirstElement;
                 //Console.WriteLine("F: " + uj.NextElement.Key);
             }
+
+            _ListCount++;
         }
 
         /*public void Add(TourdeNIK.Versenyzo element)
@@ -160,8 +162,9 @@ namespace TourdeNIK
         internal ListElement Find(int azonosito)
         {
             ListElement aktualis = _FirstElement;
-            while (aktualis != null && aktualis.Key != azonosito && !aktualis.LastElement)
+            while (aktualis != null && aktualis.Key != azonosito)
             {
+                if (aktualis.LastElement) break;
                 aktualis = aktualis.NextElement;
             }
             return aktualis != null ? aktualis : null;
@@ -170,8 +173,9 @@ namespace TourdeNIK
         internal ListElement Find(string azonosito)
         {
             ListElement aktualis = _FirstElement;
-            while (aktualis != null && aktualis.ElementValue.VersenyzoAzonosito != azonosito && !aktualis.LastElement)
+            while (aktualis != null && aktualis.ElementValue.VersenyzoAzonosito != azonosito)
             {
+                if (aktualis.LastElement) break;
                 aktualis = aktualis.NextElement;
             }
             return aktualis != null ? aktualis : null;
@@ -186,6 +190,28 @@ namespace TourdeNIK
                 if (aktualis.LastElement) break;
                 aktualis = aktualis.NextElement;
             }
+        }
+
+        public int PartAmount()
+        {
+            int amount = 0;
+            ListElement aktualis = _FirstElement;
+            while (aktualis != null)
+            {
+                if (aktualis.ElementValue.Versenyek.FirstElement != null)
+                {
+                    RegularChainedList<Verseny>.ListElement aktualisverseny = aktualis.ElementValue.Versenyek.FirstElement;
+                    while (aktualisverseny != null)
+                    {
+                        amount++;
+                        aktualisverseny = aktualisverseny.NextElement;
+                    }
+                }
+
+                if (aktualis.LastElement) break;
+                aktualis = aktualis.NextElement;
+            }
+            return amount;
         }
 
         public void Remove(Versenyzo element)
@@ -228,6 +254,110 @@ namespace TourdeNIK
                 }
                 _ListCount--;
             }
+        }
+        
+        public string[] BrigadBeosztas(RegularChainedList<Verseny> versenyek)
+        {
+            int[] M = new int[versenyek.Count];
+            Versenyzo[,] tomb = ConvertListTo2DimArray(versenyek, ref M);
+            /*foreach (var x in tomb)
+            {
+                if (x != null)
+                {
+                    Console.WriteLine("BEKERÜLT: " + x.Nev);
+                }
+                else
+                {
+                    //Console.WriteLine("null");
+                }
+            }*/
+            var beosztottCsapat = new Versenyzo[versenyek.Count];
+
+            bool van = false;
+            BTS(0, ref beosztottCsapat, ref van, M, tomb);
+
+            if (van)
+            {
+                //Console.WriteLine("VAN MEGOLDÁS GEC");
+                string[] nevek = new string[beosztottCsapat.Length];
+                for (int i = 0; i < nevek.Length; i++)
+                {
+                    nevek[i] = beosztottCsapat[i].Nev;
+                }
+                return nevek;
+            }
+            //Console.WriteLine("Anyád");
+
+            return null;
+        }
+        
+        private Versenyzo[,] ConvertListTo2DimArray(RegularChainedList<Verseny> versenyek, ref int[] M)
+        { 
+            // tesztként ez 7 oszlop és 3 sor lesz
+            Versenyzo[,] tomb = new Versenyzo[versenyek.Count, Count];
+            //Console.WriteLine("Versenyek: " + versenyek.Count);
+            //Console.WriteLine("BR: " + Count);
+            for (int i = 0; i < M.Length; i++)
+            {
+                M[i] = -1;
+            }
+
+            var aktualis = FirstElement;
+            while (aktualis != null)
+            {
+                //Console.WriteLine("nev: " + aktualis.ElementValue.Nev);
+                var versenyekelement = aktualis.ElementValue.Versenyek.FirstElement;
+                while (versenyekelement != null)
+                {
+                    //Console.WriteLine("Verseny ami jön: " + versenyekelement.ElementValue.Megnevezes);
+                    int index = Convert.ToInt32(versenyekelement.ElementValue.Megnevezes.Split('y')[1]) - 1;
+                    //Console.WriteLine("M index: " + M[index] + " utána: " + (M[index] + 1) + " igazi idx: " + index + " L: " + M.Length);
+                    tomb[index, ++M[index]] = aktualis.ElementValue;
+                    if (versenyekelement.LastElement) break;
+                    versenyekelement = versenyekelement.NextElement;
+                }
+                if (aktualis.LastElement) break;
+                aktualis = aktualis.NextElement;
+            }
+            return tomb;
+        }
+        
+        private void BTS(int szint, ref Versenyzo[] E, ref bool van, int[] M, Versenyzo[,] R)
+        {
+            int i = -1;
+            while (!van && i < M[szint])
+            {
+                i++;
+                if (Ft(szint, R[szint, i]))
+                {
+                    if (Fk(E, R[szint, i], szint))
+                    {
+                        E[szint] = R[szint, i];
+
+                        if (szint == (R.GetLength(0) - 1))
+                        {
+                            van = true;
+                        }
+                        else
+                        {
+                            // 30%-os terhelést kap minden versenyző versenyenként fuk it.
+                            E[szint].Terheles(30);
+
+                            BTS(szint + 1, ref E, ref van, M, R);
+                        }
+                    }
+                }
+            }
+        }
+        
+        private bool Ft(int szint, Versenyzo v)
+        {
+            return v.TerhelHetoMeg();
+        }
+        
+        private bool Fk(Versenyzo[] eredmenyek, Versenyzo v, int szint)
+        {
+            return true;
         }
     }
 }
