@@ -8,7 +8,6 @@ namespace TourdeNIK
     internal class Program
     {
         public static Random Randomizer;
-        
         public static event NoLongerParticipates NParticipates;
         public delegate void NoLongerParticipates(Versenyzo v);
         
@@ -98,7 +97,8 @@ namespace TourdeNIK
             //handler.Print();
 
             Help();
-            while (true)
+            bool Run = true;
+            while (Run)
             {
                 try
                 {
@@ -159,13 +159,48 @@ namespace TourdeNIK
                             }
                             Console.WriteLine();
                             break;
+                        case 4:
+                            Console.WriteLine("Írjál be egy azonosítót.");
+                            string id = Console.ReadLine();
+                            
+                            Versenyzo v = handler.AlertRemoval(id);
+                            if (v != null)
+                            {
+                                if (NParticipates != null)
+                                {
+                                    NParticipates(v);
+                                }
+                                Console.WriteLine("Törlés megtörtént!");
+                            }
+                            else
+                            {
+                                Console.WriteLine("Nem található!");
+                            }
+                            break;
+                        case 5:
+                            Console.WriteLine("Írjál be egy brigád nevet.");
+                            string name = Console.ReadLine();
+                            
+                            bool b3 = handler.VersenyBrigadDelete(name);
+                            if (b3)
+                            {
+                                Console.WriteLine("Törlés megtörtént!");
+                            }
+                            else
+                            {
+                                Console.WriteLine("Nem található!");
+                            }
+                            break;
+                        case 6:
+                            Run = false;
+                            break;
                     }
                     Console.WriteLine("Folytatáshoz nyomj meg egy billenytű gombot.");
                     Console.ReadKey();
                 }
                 catch (Exception ex)
                 {
-                    
+                    Console.WriteLine("Hibás bevitel, vagy valami kritikus hiba történt! " + ex);
                 }
             }
 
@@ -181,6 +216,7 @@ namespace TourdeNIK
             Console.WriteLine("3. Melyik versenyző melyik versenyen vett részt");
             Console.WriteLine("4. Versenyző törlése");
             Console.WriteLine("5. Brigád törlése");
+            Console.WriteLine("6. Kilépés");
         }
         
         internal static string RandomString(int length)

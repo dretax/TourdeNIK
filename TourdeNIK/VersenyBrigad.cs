@@ -38,21 +38,34 @@ namespace TourdeNIK
             _brigadname = brigadnev;
         }
 
+        /// <summary>
+        /// Visszaadja a Brigád nevét.
+        /// </summary>
         public string Name
         {
             get { return _brigadname; }
         }
 
+        /// <summary>
+        /// Visszaadja az első elemet a listából.
+        /// </summary>
         internal ListElement FirstElement
         {
             get { return _FirstElement; }
         }
 
+        /// <summary>
+        /// Visszaadja a jelenlegi elemek számát.
+        /// </summary>
         public int Count
         {
             get { return _ListCount; }
         }
 
+        /// <summary>
+        /// Beilleszt egy versenyzőt a Brigádba rendezetten. (EA jegyzet alapján.)
+        /// </summary>
+        /// <param name="element"></param>
         public void AddInSortedWay(Versenyzo element)
         {
             ListElement uj = new ListElement(element);
@@ -192,6 +205,10 @@ namespace TourdeNIK
             }
         }
 
+        /// <summary>
+        /// Törli az adott versenyzőt a brigádból. Ez végig nézi az összes brigádot (Egyébként feladat szerint fölöslegesen, mert 1 ember sose lesz 1 brigádban.)
+        /// </summary>
+        /// <param name="element"></param>
         public void Remove(Versenyzo element)
         {
             ListElement currentElement = _FirstElement; // Vesszük az első elemet
@@ -234,6 +251,13 @@ namespace TourdeNIK
             }
         }
         
+        /// <summary>
+        /// Beosztja az embereket úgy, hogy azonos versenyeken vegyenek részt.
+        /// A listájukat nem, ez a method vehető úgy, hogy a végleges verseny listát
+        /// hozza létre a résztvevőknek, hogy kinek hol kell szerepelnie.
+        /// </summary>
+        /// <param name="versenyek"></param>
+        /// <returns></returns>
         public string[] BrigadBeosztas(RegularChainedList<Verseny> versenyek)
         {
             int[] M = new int[versenyek.Count];
@@ -271,6 +295,15 @@ namespace TourdeNIK
             return null;
         }
         
+        /// <summary>
+        /// Átalakítja a láncolt listánkat egy két dimenziós tömbbé, és tulajdonképpen annyi oszlopot hoz
+        /// létre ahány verseny van, illetve annyi sort ahány versenyző van a brigádban.
+        /// Ezt követően a Backtrack logikája alapján elkezdi őket besorolni a lehetséges megoldásokkal
+        /// az optimális egyetlen lehetőséghez.
+        /// </summary>
+        /// <param name="versenyek"></param>
+        /// <param name="M"></param>
+        /// <returns></returns>
         private Versenyzo[,] ConvertListTo2DimArray(RegularChainedList<Verseny> versenyek, ref int[] M)
         { 
             // tesztként ez 7 oszlop és 3 sor lesz
@@ -290,7 +323,7 @@ namespace TourdeNIK
                 while (versenyekelement != null)
                 {
                     //Console.WriteLine("Verseny ami jön: " + versenyekelement.ElementValue.Megnevezes);
-                    int index = Convert.ToInt32(versenyekelement.ElementValue.Megnevezes.Split('y')[1]) - 1;
+                    int index = int.Parse(versenyekelement.ElementValue.Megnevezes.Split('y')[1]) - 1;
                     //Console.WriteLine("M index: " + M[index] + " utána: " + (M[index] + 1) + " igazi idx: " + index + " L: " + M.Length);
                     tomb[index, ++M[index]] = aktualis.ElementValue;
                     if (versenyekelement.LastElement) break;
@@ -302,16 +335,27 @@ namespace TourdeNIK
             return tomb;
         }
         
+        /// <summary>
+        /// Ref EA jegyzet.
+        /// </summary>
+        /// <param name="szint"></param>
+        /// <param name="E"></param>
+        /// <param name="van"></param>
+        /// <param name="M"></param>
+        /// <param name="R"></param>
         private void BTS(int szint, ref Versenyzo[] E, ref bool van, int[] M, Versenyzo[,] R)
         {
             int i = -1;
             while (!van && i < M[szint])
             {
                 i++;
+                // Megnézzük, hogy terhelhető-e még a versenyzőnk
                 if (Ft(szint, R[szint, i]))
                 {
+                    // ezt csak így hagytam mivel nekünk 1 megoldás kell és nem kell több, így itt elég igazt visszadobni.
                     if (Fk(E, R[szint, i], szint))
                     {
+                        // Betesszük a megoldásainkba.
                         E[szint] = R[szint, i];
 
                         if (szint == (R.GetLength(0) - 1))

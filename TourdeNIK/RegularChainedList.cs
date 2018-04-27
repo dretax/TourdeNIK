@@ -3,6 +3,11 @@ using System.Threading;
 
 namespace TourdeNIK
 {
+    /// <summary>
+    /// Több típusra létrehozott láncolt lista osztály, ugyanúgy össze van kötve
+    /// az utolsó eleme az elsővel ahogy a feladat írta.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public class RegularChainedList<T>
     {
         internal class ListElement

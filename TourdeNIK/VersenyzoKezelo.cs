@@ -27,8 +27,11 @@ namespace TourdeNIK
         }
         
         private VersenyzoKezelo.ListElement _FirstElement;
-        private int VersenyBrigadCount;
+        private int _VersenyBrigadCount;
 
+        /// <summary>
+        /// Visszaadja a láncolt listában lévő első elemet.
+        /// </summary>
         internal VersenyzoKezelo.ListElement FirstElement
         {
             get { return _FirstElement; }
@@ -72,7 +75,7 @@ namespace TourdeNIK
         }
 
         /// <summary>
-        /// Hozzáadja a versenybrigádot a listához.
+        /// Hozzáadja a versenybrigádot a listához. NEM rendezett módon.
         /// </summary>
         /// <param name="element"></param>
         public void VersenyBrigadAdd(VersenyBrigad element)
@@ -83,7 +86,7 @@ namespace TourdeNIK
             uj.NextElement = _FirstElement;
             
             _FirstElement = uj;
-            VersenyBrigadCount++;
+            _VersenyBrigadCount++;
         }
         
         /// <summary>
@@ -112,8 +115,74 @@ namespace TourdeNIK
                     _FirstElement = currentElement.NextElement; // Ez null lesz ha a listánk abszolút üres lesz.
                 }
 
-                VersenyBrigadCount--;
+                BrigadDisbanded(element);
+
+                _VersenyBrigadCount--;
             }
+        }
+        
+        /// <summary>
+        /// Törli a specifikus versenybrigádot.
+        /// </summary>
+        /// <param name="element"></param>
+        public bool VersenyBrigadDelete(string brigadname)
+        {
+            VersenyzoKezelo.ListElement currentElement = _FirstElement; // Vesszük az első elemet
+            VersenyzoKezelo.ListElement lastElement = null;
+            
+            // Addig megyünk amíg a jelenlegi elemünk nem null, és az érték nem egyezik a megadottal.
+            while (currentElement != null && currentElement.ElementValue.Name.ToLower() != brigadname.ToLower())
+            {
+                lastElement = currentElement; // Az "utolsó" elemünk lesz a jelenlegi elem. Ez akar lenni a keresett elem előtti elem.
+                currentElement = currentElement.NextElement; // Vesszük a következő elemet
+            }
+            if (currentElement != null)
+            {
+                BrigadDisbanded(currentElement.ElementValue);
+                if (lastElement != null) // Ha van utolsó értékünk
+                {
+                    lastElement.NextElement = currentElement.NextElement; 
+                }
+                else
+                {
+                    _FirstElement = currentElement.NextElement; // Ez null lesz ha a listánk abszolút üres lesz.
+                }
+
+                _VersenyBrigadCount--;
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Csak is a delegate miatt lett létrehozva a feladat szerint.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        internal Versenyzo AlertRemoval(string id)
+        {
+            VersenyzoKezelo.ListElement currentElement = _FirstElement; // Vesszük az első elemet
+            
+            // Addig megyünk amíg a jelenlegi elemünk nem null, és az érték nem egyezik a megadottal.
+            while (currentElement != null)
+            {
+                VersenyBrigad brigad = currentElement.ElementValue;
+                VersenyBrigad.ListElement element = brigad.FirstElement;
+                while (element != null)
+                {
+                    Versenyzo v2 = element.ElementValue;
+                    if (v2.VersenyzoAzonosito == id)
+                    {
+                        return v2;
+                    }
+                    if (element.LastElement) break;
+                    element = element.NextElement;
+                }
+                
+                currentElement = currentElement.NextElement; // Vesszük a következő elemet
+            }
+            return null;
         }
 
         /// <summary>
@@ -186,6 +255,52 @@ namespace TourdeNIK
         }
         
         /// <summary>
+        /// Ezt a methodot úgy írtam meg, hogy az összes brigádot végig nézi egy adott versenyzőért, és ha megtalálja törli.
+        /// Nem feltétlenül szükséges a használata, csak előre megcsináltam ha esetleg kellene.
+        /// </summary>
+        /// <param name="v"></param>
+        public bool VersenyzoTorol(string id)
+        {
+            VersenyzoKezelo.ListElement currentElement = _FirstElement; // Vesszük az első elemet
+            
+            // Addig megyünk amíg a jelenlegi elemünk nem null, és az érték nem egyezik a megadottal.
+            while (currentElement != null)
+            {
+                VersenyBrigad brigad = currentElement.ElementValue;
+                VersenyBrigad.ListElement element = brigad.FirstElement;
+                while (element != null)
+                {
+                    Versenyzo v2 = element.ElementValue;
+                    if (v2.VersenyzoAzonosito == id)
+                    {
+                        brigad.Remove(v2);
+                        if (brigad.FirstElement == null)
+                        {
+                            VersenyBrigadDelete(brigad);
+                        }
+                        else
+                        {
+                            // Ha véletlenül az első elem kerülne törlésre frissítsük az kulcs értéket a legkisebbre.
+                            // Így megtartjuk, hogy a brigádok mindíg a legkisebb azonosítószámmal vannak feltüntetve.
+                            if (brigad.FirstElement != null)
+                            {
+                                this._FirstElement.Key = brigad.FirstElement.Key;
+                            }
+                        }
+
+                        return true;
+                    }
+                    if (element.LastElement) break;
+                    element = element.NextElement;
+                }
+                
+                currentElement = currentElement.NextElement; // Vesszük a következő elemet
+            }
+
+            return false;
+        }
+        
+        /// <summary>
         /// Kiírja a listában lévő kulcsértékeket és azok értékeit.
         /// A kulcs a brigádban lévő versenyző UniqueID-je lesz (Az elsőé)
         /// </summary>
@@ -228,44 +343,58 @@ namespace TourdeNIK
         /// </summary>
         public void VersenyBrigadSort()
         {
-            if (VersenyBrigadCount <= 1)
+            if (_VersenyBrigadCount <= 1)
             {
                 return;
             }
+            // Fej és a jelenlegi elem az elejénél ugyanaz lesz, ahogy az előző elem is.
             VersenyzoKezelo.ListElement head = _FirstElement;
             VersenyzoKezelo.ListElement _current = _FirstElement;
             VersenyzoKezelo.ListElement _previous = _current;
+            // A "legkisebb" elemmel is ugyanez a helyzet, és vesszük mellé az előző legkisebbet.
             VersenyzoKezelo.ListElement _min = _current;
             VersenyzoKezelo.ListElement _minPrevious = _min;
+            
+            // A Rendezett listánk első elemje még nem létezik, és a vége sem.
             VersenyzoKezelo.ListElement _sortedListHead = null;
             VersenyzoKezelo.ListElement _sortedListTail = _sortedListHead;
-            for (int i = 0; i < VersenyBrigadCount; i++)
+            // N darabszámig megyünk.
+            for (int i = 0; i < _VersenyBrigadCount; i++)
             {
                 _current = head;
                 _min = _current;
                 _minPrevious = _min;
                 
+                // Amíg a jelenlegi elemünk nem null
                 while (_current != null)
                 {
+                    // Ha a jelenlegi kulcsa kisebb mint a minimumé
+                    // Ez elősször hamis lesz, hisz mind a kettő az első elem lesz.
                     if (_current.Key < _min.Key)
                     {
                         _min = _current;
                         _minPrevious = _previous;
                     }
+                    // Előző elemet megadjuk a jelenlegivel, majd továbbmegyünk (Végig), ha véletlenül a következő elemünk kisebb
+                    // mint a jelenlegi ^, akkor új minimális elemünk lesz.
                     _previous = _current;
                     _current = _current.NextElement;
                 }
 
+                // Ha a jelenlegi fejünk megegyezik a minimális elemmel, akkor a "fej" a következő elem lesz.
                 if (_min == head)
                 {
+                    //Console.WriteLine("A fej egyenlő, " + head.Key);
                     head = head.NextElement;
                 }
-                else if (_min.NextElement == null)
+                else if (_min.NextElement == null) // Ez akkor következne be, ha 1nél kevesebb elemünk lenne, ezt itt hagyom demonstrációnak.
                 {
+                    //Console.WriteLine("lolle, null");
                     _minPrevious.NextElement = null;
                 }
                 else
                 {
+                    // Minden más egyébben az előző minimális értékű elem következő elemjének megadjuk az az utáni elemet.
                     _minPrevious.NextElement = _minPrevious.NextElement.NextElement;
                 }
 
@@ -276,11 +405,13 @@ namespace TourdeNIK
                 }
                 else
                 {
+                    //Console.WriteLine("lolle: " + _min.Key);
                     _sortedListHead = _min;
                     _sortedListTail = _sortedListHead;
                 }
             }
 
+            // Az első elem az új "fej" lesz.
             _FirstElement = _sortedListHead;
         }
     }
