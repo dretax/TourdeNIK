@@ -14,7 +14,7 @@ namespace TourdeNIK
             Nem = nem;
             Lakhely = lakhely;
             GenerateID();
-            _folyadekigeny = Program.Randomizer.NextDouble() * (2.5 - 0.5) + 0.5; // Egy próba két érték közötti double randomra.
+            _folyadekigeny = Program.Randomizer.NextDouble() * (2.5 - 1) + 1; // Egy próba két érték közötti double randomra.
             Versenyek = new RegularChainedList<Verseny>();
             Program.NParticipates += NemVersenyzikTobbet;
         }
@@ -26,7 +26,6 @@ namespace TourdeNIK
         
         public RegularChainedList<Verseny> Versenyek { get; set; }
         public string Nev { get; set; }
-        public string RovidNev { get; set; }
         public string VersenyzoAzonosito { get; set; }
         public string Lakhely { get; set; }
         public string Nem { get; set; }

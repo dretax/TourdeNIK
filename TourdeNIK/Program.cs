@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.IO;
 
 namespace TourdeNIK
@@ -14,43 +16,6 @@ namespace TourdeNIK
         {
             Randomizer = new Random();
             
-            /*VersenyBrigad asd = new VersenyBrigad();
-
-            for (int i = 0; i < 10; i++)
-            {
-                asd.AddInSortedWay(new Versenyzo(RandomString(10)));
-            }
-
-            Console.WriteLine("1. brigád érték: " + asd.FirstElement.Key);
-            
-            VersenyBrigad asd2 = new VersenyBrigad();
-
-            for (int i = 0; i < 10; i++)
-            {
-                asd2.AddInSortedWay(new Versenyzo(RandomString(10)));
-            }
-
-            Console.WriteLine("2. brigád érték: " + asd2.FirstElement.Key);
-            
-            VersenyBrigad asd3 = new VersenyBrigad();
-
-            for (int i = 0; i < 10; i++)
-            {
-                asd3.AddInSortedWay(new Versenyzo(RandomString(10)));
-            }
-
-            Console.WriteLine("3. brigád érték: " + asd3.FirstElement.Key);
-            
-            VersenyzoKezelo.InitializeKezelo();
-            VersenyzoKezelo handler = VersenyzoKezelo.Instance;
-            
-            handler.VersenyBrigadAdd(asd);
-            handler.VersenyBrigadAdd(asd2);
-            handler.VersenyBrigadAdd(asd3);
-            
-            handler.VersenyBrigadSort();
-            
-            handler.Print();*/
             if (!File.Exists("Brigadok.ini"))
             {
                 throw new FileNotFoundException("Brigádok Ini file hiányzik!");
@@ -61,18 +26,21 @@ namespace TourdeNIK
                 throw new FileNotFoundException("Versenyek Ini file hiányzik!");
             }
             
+            // Kezelő Statikus Inicializálója
             VersenyzoKezelo.InitializeKezelo();
             VersenyzoKezelo handler = VersenyzoKezelo.Instance;
             
+            // Versenyek beolvasása
             IniParser versenyek = new IniParser("Versenyek.ini");
+            List<Verseny> AvailableRacesNORML = new List<Verseny>();
             RegularChainedList<Verseny> AvailableRaces = new RegularChainedList<Verseny>();
             try
             {
                 foreach (var x in versenyek.EnumSection("Versenyek"))
                 {
-                    int time = 1;
-                    int.TryParse(versenyek.GetSetting("Versenyek", x), out time);
-                    AvailableRaces.Add(new Verseny(x, time));
+                    AvailableRaces.Add(new Verseny(x));
+                    
+                    AvailableRacesNORML.Add(new Verseny(x));
                 }
             }
             catch (Exception ex)
@@ -81,6 +49,7 @@ namespace TourdeNIK
             }
             
             
+            // Versenyzők és brigádjaik/adataik beolvasása.
             IniParser ini = new IniParser("Brigadok.ini");
             try
             {
@@ -96,7 +65,13 @@ namespace TourdeNIK
                         handler.VersenyzoHozzaAdd(brigad, v);
                         foreach (var z in data[2].Split(','))
                         {
-                            v.Versenyek.Add(new Verseny(z, 1));
+                            foreach (var verseny in AvailableRacesNORML)
+                            {
+                                if (verseny.Megnevezes == z)
+                                {
+                                    v.Versenyek.Add(verseny);
+                                }
+                            }
                         }
 
                         //vteszt = brigad.FirstElement.ElementValue;
@@ -106,7 +81,6 @@ namespace TourdeNIK
 
                     handler.VersenyBrigadAdd(brigad); // A brigádot hozzáadjuk a listához.
 
-                    brigad.BrigadBeosztas(AvailableRaces);
                     //Console.WriteLine(x + " : " + brigad.FirstElement.Key);
                 }
                 
@@ -119,17 +93,100 @@ namespace TourdeNIK
             {
                 throw new FileLoadException("Hiba a brigádok file olvasásakor! " + ex);
             }
-            handler.VersenyBrigadSort();
-            handler.Print();
+            //handler.Print();
+            //handler.VersenyBrigadSort();
+            //handler.Print();
 
+            Help();
+            while (true)
+            {
+                try
+                {
+                    string s = Console.ReadLine();
+                    int i;
+                    bool b = int.TryParse(s, out i);
+                    while (!b)
+                    {
+                        Console.WriteLine("Hibás Opció! Listázom a lehetőségeket.");
+                        Help();
+                        s = Console.ReadLine();
+                        b = int.TryParse(s, out i);
+                    }
+
+                    switch (i)
+                    {
+                        case 1:
+                            handler.VersenyBrigadSort();
+                            Console.WriteLine("Brigádok rendezve!");
+                            break;
+                        case 2:
+                            Console.WriteLine("Listázás.");
+                            var brigadelement = handler.FirstElement;
+                            while (brigadelement != null)
+                            {
+                                Console.WriteLine("Brigád: " + brigadelement.ElementValue.Name + " -- első kulcsa: " + brigadelement.Key);
+                                var versenyzoelement = brigadelement.ElementValue.FirstElement;
+                                while (versenyzoelement != null)
+                                {
+                                    var versenyzo = versenyzoelement.ElementValue;
+                                    Console.WriteLine(versenyzo.Nev + " " + versenyzo.VersenyzoAzonosito + " " + versenyzo.Lakhely);
+
+                                    if (versenyzoelement.LastElement) break;
+                                    versenyzoelement = versenyzoelement.NextElement;
+                                }
+
+                                Console.WriteLine();
+                                brigadelement = brigadelement.NextElement;
+                            }
+                            break;
+                        case 3:
+                            Console.WriteLine("Megpróbálkozunk a versenyző versenyszámainak optimalizálásával.");
+                            Console.WriteLine();
+
+                            foreach (var x in AvailableRacesNORML)
+                            {
+                                Console.Write(x.Megnevezes + "\t");
+                            }
+
+                            Console.WriteLine();
+                            try
+                            {
+                                handler.VersenyBrigadBeosztasKiir(AvailableRaces);
+                            }
+                            catch
+                            {
+                                //todo
+                            }
+                            Console.WriteLine();
+                            break;
+                    }
+                    Console.WriteLine("Folytatáshoz nyomj meg egy billenytű gombot.");
+                    Console.ReadKey();
+                }
+                catch (Exception ex)
+                {
+                    
+                }
+            }
 
             //Console.ReadKey();
+        }
+        
+        private static void Help()
+        {
+            Console.WriteLine();
+            Console.WriteLine("Válassz egy opciót (Üss be egy számot)");
+            Console.WriteLine("1. Brigádok rendezése");
+            Console.WriteLine("2. Összes versenyző kiíratása brigádonként sorrendben.");
+            Console.WriteLine("3. Melyik versenyző melyik versenyen vett részt");
+            Console.WriteLine("4. Versenyző törlése");
+            Console.WriteLine("5. Brigád törlése");
         }
         
         internal static string RandomString(int length)
         {
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-            var stringChars = new char[length];
+            char[] stringChars = new char[length];
             for (int i = 0; i < length; i++)
             {
                 int random = Randomizer.Next(0, chars.Length);

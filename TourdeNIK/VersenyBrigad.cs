@@ -192,28 +192,6 @@ namespace TourdeNIK
             }
         }
 
-        public int PartAmount()
-        {
-            int amount = 0;
-            ListElement aktualis = _FirstElement;
-            while (aktualis != null)
-            {
-                if (aktualis.ElementValue.Versenyek.FirstElement != null)
-                {
-                    RegularChainedList<Verseny>.ListElement aktualisverseny = aktualis.ElementValue.Versenyek.FirstElement;
-                    while (aktualisverseny != null)
-                    {
-                        amount++;
-                        aktualisverseny = aktualisverseny.NextElement;
-                    }
-                }
-
-                if (aktualis.LastElement) break;
-                aktualis = aktualis.NextElement;
-            }
-            return amount;
-        }
-
         public void Remove(Versenyzo element)
         {
             ListElement currentElement = _FirstElement; // Vesszük az első elemet
@@ -282,8 +260,10 @@ namespace TourdeNIK
                 string[] nevek = new string[beosztottCsapat.Length];
                 for (int i = 0; i < nevek.Length; i++)
                 {
+                    //Console.WriteLine(beosztottCsapat[i].Nev);
                     nevek[i] = beosztottCsapat[i].Nev;
                 }
+                
                 return nevek;
             }
             //Console.WriteLine("Anyád");

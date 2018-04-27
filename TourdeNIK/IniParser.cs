@@ -15,19 +15,12 @@ namespace TourdeNIK
         /// Ini útvonala
         /// </summary>
         private string iniFilePath;
+        
         /// <summary>
-        /// Hashtable, hogy minden típusnak megfeleljen
+        /// Dictionary amely tárolja a section-t és key-t kulcsként illetve az értéket.
         /// </summary>
-        private Hashtable keyPairs = new Hashtable();
-        /// <summary>
-        /// Ini neve
-        /// </summary>
-        internal string Name;
-        /// <summary>
-        /// Adatok
-        /// </summary>
-        private System.Collections.Generic.List<SectionPair> tmpList = new System.Collections.Generic.List<SectionPair>();
-
+        private readonly Dictionary<SectionPair, string> keyPairs = new Dictionary<SectionPair, string>();
+        
         /// <summary>
         /// Ini beolvasása szekcióktól, majd kulcsoktól és értékektől
         /// </summary>
@@ -36,7 +29,6 @@ namespace TourdeNIK
         {
             string str2 = null;
             this.iniFilePath = iniPath;
-            this.Name = Path.GetFileNameWithoutExtension(iniPath);
 
             if (!File.Exists(iniPath)) throw new FileNotFoundException("Nem található a file! " + iniPath);
 
@@ -47,16 +39,14 @@ namespace TourdeNIK
                     for (string str = reader.ReadLine(); str != null; str = reader.ReadLine())
                     {
                         str = str.Trim();
-                        if (str == "") continue;
+                        if (string.IsNullOrEmpty(str)) continue;
 
                         if (str.StartsWith("[") && str.EndsWith("]"))
-                            str2 = str.Substring(1, str.Length - 2);
+                            str2 = str.Substring(1, str.Length - 2); // [] között lévő section kivétele
                         else
                         {
                             SectionPair pair;
 
-                            if (str.StartsWith(";"))
-                                str = str.Replace("=", "%eq%") + @"=%comment%";
 
                             string[] strArray = str.Split(new char[] { '=' }, 2);
                             string str3 = null;
@@ -66,58 +56,22 @@ namespace TourdeNIK
                             }
                             pair.Section = str2;
                             pair.Key = strArray[0];
-                            if (strArray.Length > 1)
+                            
+                            if (strArray.Length > 1) // Ha van értékünk is.
                             {
                                 str3 = strArray[1];
                             }
                             this.keyPairs.Add(pair, str3);
-                            this.tmpList.Add(pair);
                         }
                     }
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Hiba az ini olvasás közben: " + ex);
+                throw new FileLoadException("Hiba az ini olvasása közben! " + ex);
             }
         }
-
-        /// <summary>
-        /// Adat hozzáadása
-        /// </summary>
-        /// <param name="sectionName"></param>
-        /// <param name="settingName"></param>
-        internal void AddSetting(string sectionName, string settingName)
-        {
-            this.AddSetting(sectionName, settingName, string.Empty);
-        }
-
-        /// <summary>
-        /// Adat hozzáadása értékkel
-        /// </summary>
-        /// <param name="sectionName"></param>
-        /// <param name="settingName"></param>
-        /// <param name="settingValue"></param>
-        internal void AddSetting(string sectionName, string settingName, string settingValue)
-        {
-            SectionPair pair;
-            pair.Section = sectionName;
-            pair.Key = settingName;
-            if (settingValue == null)
-                settingValue = string.Empty;
-
-            if (this.keyPairs.ContainsKey(pair))
-            {
-                this.keyPairs.Remove(pair);
-            }
-            if (this.tmpList.Contains(pair))
-            {
-                this.tmpList.Remove(pair);
-            }
-            this.keyPairs.Add(pair, settingValue);
-            this.tmpList.Add(pair);
-        }
-
+        
         /// <summary>
         /// Szekciók megszámlálása
         /// </summary>
@@ -128,23 +82,6 @@ namespace TourdeNIK
         }
 
         /// <summary>
-        /// Adat törlése
-        /// </summary>
-        /// <param name="sectionName"></param>
-        /// <param name="settingName"></param>
-        internal void DeleteSetting(string sectionName, string settingName)
-        {
-            SectionPair pair;
-            pair.Section = sectionName;
-            pair.Key = settingName;
-            if (this.keyPairs.ContainsKey(pair))
-            {
-                this.keyPairs.Remove(pair);
-                this.tmpList.Remove(pair);
-            }
-        }
-
-        /// <summary>
         /// Szekció kulcsainak lekérdezése
         /// </summary>
         /// <param name="sectionName"></param>
@@ -152,7 +89,7 @@ namespace TourdeNIK
         internal string[] EnumSection(string sectionName)
         {
             List<string> list = new List<string>();
-            foreach (SectionPair pair in this.tmpList)
+            foreach (SectionPair pair in this.keyPairs.Keys)
             {
                 if (pair.Key.StartsWith(";"))
                     continue;
@@ -173,7 +110,7 @@ namespace TourdeNIK
             get
             {
                 List<string> list = new List<string>();
-                foreach (SectionPair pair in this.tmpList)
+                foreach (SectionPair pair in this.keyPairs.Keys)
                 {
                     if (!list.Contains(pair.Section))
                     {
@@ -196,79 +133,6 @@ namespace TourdeNIK
             pair.Section = sectionName;
             pair.Key = settingName;
             return (string)this.keyPairs[pair];
-        }
-
-        /// <summary>
-        /// Ini file mentése
-        /// </summary>
-        internal void Save()
-        {
-            SaveSettings(this.iniFilePath);
-        }
-
-        /// <summary>
-        /// Mentést kezelő method
-        /// </summary>
-        /// <param name="newFilePath"></param>
-        private void SaveSettings(string newFilePath)
-        {
-            ArrayList list = new ArrayList();
-            string str = "";
-            string str2 = "";
-            foreach (SectionPair pair in this.tmpList)
-            {
-                if (!list.Contains(pair.Section))
-                {
-                    list.Add(pair.Section);
-                }
-            }
-            foreach (string str3 in list)
-            {
-                str2 = str2 + "[" + str3 + "]\r\n";
-                foreach (SectionPair pair2 in this.tmpList)
-                {
-                    if (pair2.Section == str3)
-                    {
-                        str = (string)this.keyPairs[pair2];
-                        if (str != null)
-                        {
-                            if (str == "%comment%")
-                            {
-                                str = "";
-                            }
-                            else
-                            {
-                                str = "=" + str;
-                            }
-                        }
-                        str2 = str2 + pair2.Key.Replace("%eq%", "=") + str + "\r\n";
-                    }
-                }
-                str2 = str2 + "\r\n";
-            }
-
-            using (TextWriter writer = new StreamWriter(newFilePath))
-                writer.Write(str2);
-        }
-
-        /// <summary>
-        /// Már létező beállítás átírása
-        /// </summary>
-        /// <param name="sectionName"></param>
-        /// <param name="settingName"></param>
-        /// <param name="value"></param>
-        internal void SetSetting(string sectionName, string settingName, string value)
-        {
-            SectionPair pair;
-            pair.Section = sectionName;
-            pair.Key = settingName;
-            if (string.IsNullOrEmpty(value))
-                value = string.Empty;
-
-            if (this.keyPairs.ContainsKey(pair))
-            {
-                this.keyPairs[pair] = value;
-            }
         }
 
         /// <summary>

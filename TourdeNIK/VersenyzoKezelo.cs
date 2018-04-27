@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Dynamic;
 
 namespace TourdeNIK
@@ -9,7 +10,7 @@ namespace TourdeNIK
         /// Ez az osztály kifejezetten csak VersenyBrigádokat tárol.
         /// Kulcs értéke a Brigádon belüli első elemnek az azonosítója.
         /// </summary>
-        private class ListElement
+        internal class ListElement
         {
             public int Key;
             public VersenyBrigad ElementValue;
@@ -27,6 +28,11 @@ namespace TourdeNIK
         
         private VersenyzoKezelo.ListElement _FirstElement;
         private int VersenyBrigadCount;
+
+        internal VersenyzoKezelo.ListElement FirstElement
+        {
+            get { return _FirstElement; }
+        }
         
         /// <summary>
         /// Delegáltak.
@@ -149,33 +155,30 @@ namespace TourdeNIK
             while (currentElement != null)
             {
                 VersenyBrigad brigad = currentElement.ElementValue;
-                if (brigad.FirstElement != null)
+                VersenyBrigad.ListElement element = brigad.FirstElement;
+                while (element != null)
                 {
-                    VersenyBrigad.ListElement element = brigad.FirstElement;
-                    while (element != null)
+                    Versenyzo v2 = element.ElementValue;
+                    if (v2.Equals(v))
                     {
-                        Versenyzo v2 = element.ElementValue;
-                        if (v2.Equals(v))
+                        brigad.Remove(v2);
+                        if (brigad.FirstElement == null)
                         {
-                            brigad.Remove(v2);
-                            if (brigad.FirstElement == null)
-                            {
-                                VersenyBrigadDelete(brigad);
-                            }
-                            else
-                            {
-                                // Ha véletlenül az első elem kerülne törlésre frissítsük az kulcs értéket a legkisebbre.
-                                // Így megtartjuk, hogy a brigádok mindíg a legkisebb azonosítószámmal vannak feltüntetve.
-                                if (brigad.FirstElement != null)
-                                {
-                                    this._FirstElement.Key = brigad.FirstElement.Key;
-                                }
-                            }
-                            break;
+                            VersenyBrigadDelete(brigad);
                         }
-                        if (element.LastElement) break;
-                        element = element.NextElement;
+                        else
+                        {
+                            // Ha véletlenül az első elem kerülne törlésre frissítsük az kulcs értéket a legkisebbre.
+                            // Így megtartjuk, hogy a brigádok mindíg a legkisebb azonosítószámmal vannak feltüntetve.
+                            if (brigad.FirstElement != null)
+                            {
+                                this._FirstElement.Key = brigad.FirstElement.Key;
+                            }
+                        }
+                        break;
                     }
+                    if (element.LastElement) break;
+                    element = element.NextElement;
                 }
                 
                 currentElement = currentElement.NextElement; // Vesszük a következő elemet
@@ -200,9 +203,24 @@ namespace TourdeNIK
         /// A brigádban lévő versenyzőknek hasonló mennyiségű versenyt oszt ki a leterheltségük alapján.
         /// </summary>
         /// <param name="b"></param>
-        public void VersenyBrigadBeoszt(RegularChainedList<VersenyBrigad> brigadok, VersenyBrigad ideiglenes)
+        public void VersenyBrigadBeosztasKiir(RegularChainedList<Verseny> versenyek)
         {
-            
+            //verseny.Reverse();
+            var brigadelement = _FirstElement;
+            //Console.WriteLine("brigadelement " + brigadelement);
+            while (brigadelement != null)
+            {
+                string[] val = brigadelement.ElementValue.BrigadBeosztas(versenyek);
+                //Console.WriteLine("HAHÓ");
+                //Console.WriteLine(string.Join(" ", val));
+                for (int i = 0; i < val.Length; i++)
+                {
+                    Console.Write(val[i] + "\t");
+                }
+
+                Console.WriteLine();
+                brigadelement = brigadelement.NextElement;
+            }
         }
         
         /// <summary>
