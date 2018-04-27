@@ -38,6 +38,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Exceptions.cs" />
     <Compile Include="IniParser.cs" />
     <Compile Include="IVersenyzo.cs" />
     <Compile Include="Program.cs" />

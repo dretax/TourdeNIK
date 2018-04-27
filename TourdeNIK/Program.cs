@@ -56,11 +56,19 @@ namespace TourdeNIK
                 //VersenyBrigad bteszt = null;
                 foreach (var x in ini.Sections) // Végig megyünk az összes section-n [Section1]
                 {
-                    VersenyBrigad brigad = new VersenyBrigad(x); // Létrehozzuk a brigádot, de még nem adjuk hozzá a listához.
+                    VersenyBrigad
+                        brigad = new VersenyBrigad(x); // Létrehozzuk a brigádot, de még nem adjuk hozzá a listához.
                     foreach (var y in ini.EnumSection(x))
                     {
                         var data = ini.GetSetting(x, y).Split('~');
-                        Versenyzo v = new Versenyzo(y, data[1], data[0]); // Létrehozzuk a versenyzőt az adatokkal, majd hozzáadjuk a brigádhoz rendezett beilesztéssel
+                        if (data[1].ToLower() != "f" || data[1].ToLower() != "n")
+                        {
+                            throw new InvalidRacerDatas("Hibás versenyző nem!");
+                        }
+
+                        Versenyzo
+                            v = new Versenyzo(y, data[1],
+                                data[0]); // Létrehozzuk a versenyzőt az adatokkal, majd hozzáadjuk a brigádhoz rendezett beilesztéssel
                         handler.VersenyzoHozzaAdd(brigad, v);
                         foreach (var z in data[2].Split(','))
                         {
@@ -82,11 +90,11 @@ namespace TourdeNIK
 
                     //Console.WriteLine(x + " : " + brigad.FirstElement.Key);
                 }
-                
+
                 //handler.Print();
                 //Console.WriteLine("print megvót");
                 //handler.VersenyzoTorolFromBrigad(bteszt, vteszt);
-                
+
             }
             catch (Exception ex)
             {
@@ -153,9 +161,9 @@ namespace TourdeNIK
                             {
                                 handler.VersenyBrigadBeosztasKiir(AvailableRaces);
                             }
-                            catch
+                            catch (BTSException ex)
                             {
-                                //todo
+                                Console.WriteLine("Hiba: " + ex.Message);
                             }
                             Console.WriteLine();
                             break;

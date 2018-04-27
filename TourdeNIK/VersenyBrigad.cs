@@ -290,9 +290,8 @@ namespace TourdeNIK
                 
                 return nevek;
             }
-            //Console.WriteLine("Anyád");
 
-            return null;
+            throw new BTSException("Nem sikerült optimális megoldást találni.");
         }
         
         /// <summary>
