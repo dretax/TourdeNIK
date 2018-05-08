@@ -61,7 +61,7 @@ namespace TourdeNIK
                     foreach (var y in ini.EnumSection(x))
                     {
                         var data = ini.GetSetting(x, y).Split('~');
-                        if (data[1].ToLower() != "f" || data[1].ToLower() != "n")
+                        if (data[1].ToLower() != "f" && data[1].ToLower() != "n")
                         {
                             throw new InvalidRacerDatas("Hibás versenyző nem!");
                         }
@@ -178,6 +178,7 @@ namespace TourdeNIK
                                 {
                                     NParticipates(v);
                                 }
+                                handler.VersenyzoTorol(v);
                                 Console.WriteLine("Törlés megtörtént!");
                             }
                             else
